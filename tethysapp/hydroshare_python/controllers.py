@@ -1303,6 +1303,7 @@ def delete_resource(request):
 
 @controller
 def filev(request):
+    breakpoint()
     """
     Controller for the Add Dam page.
     """
@@ -1322,7 +1323,16 @@ def filev(request):
         try:
             # pass in request object
             hs = get_oauth_hs(request)
+            resourcefiles = hs.resource(resourcein).files.all()
+            status_code = resourcefiles.__dict__.get("status_code")
 
+            if status_code == 404:
+                messages.error(
+                    request,
+                    f"No Files found for the resource id: {resourcein}",
+                )
+            else:
+                return HttpResponse(resourcefiles.content)
         except Exception as e:
             auth = HydroShareAuthBasic(username=username, password=password)
             hs = HydroShare(auth=auth)
